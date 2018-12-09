@@ -1,7 +1,11 @@
 package com.example.sellfindread.bitcointracker;
 
 import android.content.Context;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import android.support.design.widget.Snackbar;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -10,10 +14,12 @@ import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.View;
 import android.widget.Toast;
 
 import com.example.sellfindread.bitcointracker.Adapter.CoinMainAdapter;
 import com.example.sellfindread.bitcointracker.Adapter.CustomItemDecorator;
+import com.example.sellfindread.bitcointracker.Connectivity.ConStatus;
 import com.example.sellfindread.bitcointracker.Interface.ILoadMore;
 import com.example.sellfindread.bitcointracker.Model.CoinModel;
 import com.example.sellfindread.bitcointracker.Model.ExchangeModel;
@@ -46,27 +52,55 @@ public class MainActivity extends AppCompatActivity {
 
     float exchangeRate;
 
+    boolean conStatus;
+
+    ConStatus receiver;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        conStatus=checkConnection();
+
+        receiver=new ConStatus();
+        receiver.mainActivityHandler(this);
+
+        networkReceiver();
+
         swipeRefreshLayout=(SwipeRefreshLayout)findViewById(R.id.mainSwipeLayout);
+
+//        if(!conStatus){
+//            Snackbar conSnackbar=Snackbar.make(swipeRefreshLayout,"No Internet Connection", Snackbar.LENGTH_LONG);
+//            conSnackbar.show();
+//        } else {
+//            Snackbar snackbar=Snackbar.make(swipeRefreshLayout, "Internet Connection", Snackbar.LENGTH_LONG);
+//            snackbar.show();
+//        }
+
         swipeRefreshLayout.post(new Runnable() {
             @Override
             public void run() {
-                loadExchangeRate();
-                loadCoinData();
+                if(conStatus) {
+                    loadExchangeRate();
+                    loadCoinData();
+                }
             }
         });
 
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                itemList.clear();
-                loadExchangeRate();
-                loadCoinData();
-                setupAdapter();
+                if(conStatus) {
+                    itemList.clear();
+                    loadExchangeRate();
+                    loadCoinData();
+                    setupAdapter();
+                }else{
+                    Snackbar snackbar=Snackbar.make(swipeRefreshLayout,"No Internet Connection", Snackbar.LENGTH_LONG);
+                    snackbar.show();
+                    swipeRefreshLayout.setRefreshing(false);
+                }
             }
         });
 
@@ -75,10 +109,62 @@ public class MainActivity extends AppCompatActivity {
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.addItemDecoration(new CustomItemDecorator(this, DividerItemDecoration.VERTICAL, 36));
         setupAdapter();
+
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        unregisterNetworkChanges();
+    }
+
+    public boolean checkConnection(){
+        ConnectivityManager connectivityManager=(ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo=connectivityManager.getActiveNetworkInfo();
+
+        if(networkInfo!=null && networkInfo.isConnected()){
+            return true;
+        }else {
+            return false;
+        }
+    }
+
+    public static void verifyConnection(boolean res){
+        if(res){
+            Log.e("Connection Test", "Connected");
+        }else{
+            Log.e("Connection Test", "Disconnected");
+        }
+    }
+
+    private void networkReceiver(){
+        registerReceiver(receiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
+    }
+
+    public void connectionResult(boolean result){
+        View rootView=findViewById(R.id.mainSwipeLayout);
+        if(result){
+            Snackbar snackbar=Snackbar.make(rootView, "Connected", Snackbar.LENGTH_LONG);
+            snackbar.show();
+            conStatus=true;
+        }else{
+            Snackbar snackbar=Snackbar.make(rootView, "No Internet Connection", Snackbar.LENGTH_LONG);
+            snackbar.show();
+            conStatus=false;
+        }
+    }
+
+    public boolean isClickAble(){
+        if(conStatus){
+            return true;
+        }else {
+            return false;
+        }
     }
 
     private void setupAdapter() {
         adapter=new CoinMainAdapter(recyclerView, MainActivity.this, itemList);
+        adapter.setMainActivity(this);
         recyclerView.setAdapter(adapter);
         adapter.setiLoadMore(new ILoadMore() {
             @Override
@@ -216,6 +302,14 @@ public class MainActivity extends AppCompatActivity {
         SharedPreferences.Editor editor=sharedPreferences.edit();
         editor.putFloat("Rate",exchangeRate);
         editor.commit();
+    }
+
+    public void unregisterNetworkChanges(){
+        try{
+            unregisterReceiver(receiver);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
 }

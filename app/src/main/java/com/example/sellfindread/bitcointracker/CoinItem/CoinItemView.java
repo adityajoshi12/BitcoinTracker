@@ -3,8 +3,11 @@ package com.example.sellfindread.bitcointracker.CoinItem;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -12,6 +15,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.sellfindread.bitcointracker.MainActivity;
 import com.example.sellfindread.bitcointracker.Model.CoinModel;
 import com.example.sellfindread.bitcointracker.R;
 import com.google.gson.Gson;
@@ -38,6 +42,8 @@ public class CoinItemView extends AppCompatActivity {
     public int position;
 
     public List<CoinModel> itemList=new ArrayList<>();
+
+    public boolean isConnected;
 
     OkHttpClient client;
     Request request;
@@ -68,38 +74,53 @@ public class CoinItemView extends AppCompatActivity {
         refreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                itemList.clear();
-                loadCoinItemData();
+                isConnected=connectionResult();
+                if(isConnected) {
+                    itemList.clear();
+                    loadCoinItemData();
+                }else{
+                    Snackbar snackbar=Snackbar.make(refreshLayout,"No Internet Connection", Snackbar.LENGTH_LONG);
+                    snackbar.show();
+                    refreshLayout.setRefreshing(false);
+                }
             }
         });
 
     }
 
     private void setUpVIew(List<CoinModel> coinList) {
-        SharedPreferences sharedPreferences=getSharedPreferences("Selected Coin",Context.MODE_PRIVATE);
-        position=sharedPreferences.getInt("Coin",1);
+        isConnected=connectionResult();
 
-        SharedPreferences preferences=getSharedPreferences("Exchange Rate",Context.MODE_PRIVATE);
-        float rate=preferences.getFloat("Rate",1);
-        Log.e("Test",String.valueOf(rate));
+        if(isConnected) {
+            SharedPreferences sharedPreferences = getSharedPreferences("Selected Coin", Context.MODE_PRIVATE);
+            position = sharedPreferences.getInt("Coin", 1);
 
-        itemModel=coinList.get(position);
+            SharedPreferences preferences = getSharedPreferences("Exchange Rate", Context.MODE_PRIVATE);
+            float rate = preferences.getFloat("Rate", 1);
+            Log.e("Test", String.valueOf(rate));
 
-        float inrPrice=(Float.valueOf(itemModel.getPrice_usd()))*rate;
+            itemModel = coinList.get(position);
 
-        itemTitle.setText(itemModel.getName());
-        itemRank.setText(itemModel.getRank());
-        itemPriceUSD.setText(itemModel.getPrice_usd());
-        itemPriceINR.setText(String.valueOf(inrPrice));
-        itemChange1h.setText(itemModel.getPercent_change_1h()+"%");
-        itemChange24h.setText(itemModel.getPercent_change_24h()+"%");
+            float inrPrice = (Float.valueOf(itemModel.getPrice_usd())) * rate;
+            String title = itemModel.getName() + "(" + itemModel.getSymbol() + ")";
 
-        itemChange1h.setTextColor(itemModel.getPercent_change_1h().contains("-")?
-                Color.parseColor("#FF0000") : Color.parseColor("#32CD32"));
+            itemTitle.setText(title);
+            itemRank.setText(itemModel.getRank());
+            itemPriceUSD.setText(itemModel.getPrice_usd());
+            itemPriceINR.setText(String.valueOf(inrPrice));
+            itemChange1h.setText(itemModel.getPercent_change_1h() + "%");
+            itemChange24h.setText(itemModel.getPercent_change_24h() + "%");
 
-        itemChange24h.setTextColor(itemModel.getPercent_change_24h().contains("-")?
-                Color.parseColor("#FF0000") : Color.parseColor("#32CD32"));
+            itemChange1h.setTextColor(itemModel.getPercent_change_1h().contains("-") ?
+                    Color.parseColor("#FF0000") : Color.parseColor("#32CD32"));
 
+            itemChange24h.setTextColor(itemModel.getPercent_change_24h().contains("-") ?
+                    Color.parseColor("#FF0000") : Color.parseColor("#32CD32"));
+
+        }else{
+            Snackbar snackbar=Snackbar.make(refreshLayout,"No Internet Connection", Snackbar.LENGTH_LONG);
+            snackbar.show();
+        }
 
     }
 
@@ -130,6 +151,17 @@ public class CoinItemView extends AppCompatActivity {
         });
 
         if(refreshLayout.isRefreshing()) refreshLayout.setRefreshing(false);
+    }
+
+    public boolean connectionResult(){
+        ConnectivityManager connectivityManager=(ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo=connectivityManager.getActiveNetworkInfo();
+
+        if(networkInfo!=null && networkInfo.isConnected()){
+            return true;
+        }else {
+            return false;
+        }
     }
 
     public CoinItemView() {
