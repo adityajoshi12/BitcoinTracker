@@ -1,4 +1,4 @@
-package com.example.sellfindread.bitcointracker.Adapter;
+package com.example.aditya.bitcointracker.Adapter;
 
 import android.app.Activity;
 import android.content.Context;
@@ -8,18 +8,16 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
 
-import com.example.sellfindread.bitcointracker.CoinItem.CoinItemView;
-import com.example.sellfindread.bitcointracker.Interface.ILoadMore;
-import com.example.sellfindread.bitcointracker.Interface.ItemClickListener;
-import com.example.sellfindread.bitcointracker.MainActivity;
-import com.example.sellfindread.bitcointracker.Model.CoinModel;
-import com.example.sellfindread.bitcointracker.R;
+import com.example.aditya.bitcointracker.CoinItem.CoinItemView;
+import com.example.aditya.bitcointracker.Interface.ILoadMore;
+import com.example.aditya.bitcointracker.Interface.ItemClickListener;
+import com.example.aditya.bitcointracker.MainActivity;
+import com.example.aditya.bitcointracker.Model.CoinModel;
+import com.example.aditya.bitcointracker.R;
 
 import java.util.List;
 

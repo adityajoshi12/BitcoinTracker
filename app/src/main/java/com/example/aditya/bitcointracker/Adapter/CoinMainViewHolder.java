@@ -1,4 +1,4 @@
-package com.example.sellfindread.bitcointracker.Adapter;
+package com.example.aditya.bitcointracker.Adapter;
 
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
@@ -6,8 +6,8 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.example.sellfindread.bitcointracker.Interface.ItemClickListener;
-import com.example.sellfindread.bitcointracker.R;
+import com.example.aditya.bitcointracker.Interface.ItemClickListener;
+import com.example.aditya.bitcointracker.R;
 
 public class CoinMainViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
     public ImageView coinSymbol;

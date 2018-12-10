@@ -1,4 +1,4 @@
-package com.example.sellfindread.bitcointracker.Model;
+package com.example.aditya.bitcointracker.Model;
 
 public class RatesRoot {
     public boolean success;

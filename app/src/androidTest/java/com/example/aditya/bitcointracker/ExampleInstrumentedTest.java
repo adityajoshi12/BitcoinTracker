@@ -1,4 +1,4 @@
-package com.example.sellfindread.bitcointracker;
+package com.example.aditya.bitcointracker;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;

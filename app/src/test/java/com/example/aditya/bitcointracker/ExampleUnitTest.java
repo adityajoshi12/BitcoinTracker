@@ -1,4 +1,4 @@
-package com.example.sellfindread.bitcointracker;
+package com.example.aditya.bitcointracker;
 
 import org.junit.Test;
 

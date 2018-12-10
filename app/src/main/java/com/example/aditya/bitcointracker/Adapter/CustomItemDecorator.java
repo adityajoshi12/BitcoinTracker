@@ -1,4 +1,4 @@
-package com.example.sellfindread.bitcointracker.Adapter;
+package com.example.aditya.bitcointracker.Adapter;
 
 import android.content.Context;
 import android.content.res.Resources;

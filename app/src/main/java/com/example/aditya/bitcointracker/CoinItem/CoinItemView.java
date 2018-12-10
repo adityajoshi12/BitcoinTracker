@@ -1,4 +1,4 @@
-package com.example.sellfindread.bitcointracker.CoinItem;
+package com.example.aditya.bitcointracker.CoinItem;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -15,9 +15,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.sellfindread.bitcointracker.MainActivity;
-import com.example.sellfindread.bitcointracker.Model.CoinModel;
-import com.example.sellfindread.bitcointracker.R;
+import com.example.aditya.bitcointracker.Model.CoinModel;
+import com.example.aditya.bitcointracker.R;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 

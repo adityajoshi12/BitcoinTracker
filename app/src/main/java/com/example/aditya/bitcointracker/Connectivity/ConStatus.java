@@ -1,16 +1,15 @@
-package com.example.sellfindread.bitcointracker.Connectivity;
+package com.example.aditya.bitcointracker.Connectivity;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.support.design.widget.Snackbar;
 import android.widget.Toast;
 
-import com.example.sellfindread.bitcointracker.MainActivity;
+import com.example.aditya.bitcointracker.MainActivity;
 
-import static com.example.sellfindread.bitcointracker.MainActivity.verifyConnection;
+import static com.example.aditya.bitcointracker.MainActivity.verifyConnection;
 
 public class ConStatus extends BroadcastReceiver{
    MainActivity mainActivity=null;
